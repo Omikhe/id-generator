@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Upload, Download, User, Users, Camera } from "lucide-react"
+import { Upload, Download, User, Users, Camera, FileText } from "lucide-react"
 import * as Papa from "papaparse"
 
 const EmployeeIDGenerator = () => {
@@ -54,6 +54,52 @@ const EmployeeIDGenerator = () => {
         skipEmptyLines: true,
       })
     }
+  }
+
+  const loadSampleCSV = () => {
+    // Load the sample CSV data
+    fetch("/sample-employees.csv")
+      .then((response) => response.text())
+      .then((csvText) => {
+        Papa.parse(csvText, {
+          complete: (results) => {
+            setCsvData(results.data.filter((row) => row.some((cell) => cell.trim())))
+          },
+          header: true,
+          skipEmptyLines: true,
+        })
+      })
+      .catch((error) => {
+        console.error("Error loading sample CSV:", error)
+        // Fallback sample data
+        const sampleData = [
+          {
+            Fullname: "Dumisani Chigwembere",
+            Position: "Property Scout",
+            "Phone Number": "+265996892495",
+            "Company email address": "dumisani.chigwembere@valuationsafrica.mw",
+            "Location (District or City where you operate)": "Lilongwe",
+            "Link to Blinq ID": "https://blinq.me/dumisani",
+          },
+          {
+            Fullname: "Thabo Mulinga",
+            Position: "Senior Valuer",
+            "Phone Number": "+265991234567",
+            "Company email address": "thabo.mulinga@valuationsafrica.mw",
+            "Location (District or City where you operate)": "Blantyre",
+            "Link to Blinq ID": "https://blinq.me/thabo",
+          },
+          {
+            Fullname: "Mphowe Njauja",
+            Position: "Property Analyst",
+            "Phone Number": "+265998765432",
+            "Company email address": "mphowe.njauja@valuationsafrica.mw",
+            "Location (District or City where you operate)": "Mzuzu",
+            "Link to Blinq ID": "https://blinq.me/mphowe",
+          },
+        ]
+        setCsvData(sampleData)
+      })
   }
 
   const generateQRCode = (text) => {
@@ -496,13 +542,22 @@ const EmployeeIDGenerator = () => {
               <p className="text-sm text-gray-500 mb-4">
                 Required columns: Fullname, Position, Phone Number, Company email address, Location, Link to Blinq ID
               </p>
-              <input ref={fileInputRef} type="file" accept=".csv" onChange={handleCSVUpload} className="hidden" />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
-              >
-                Choose CSV File
-              </button>
+              <div className="flex gap-4 justify-center">
+                <input ref={fileInputRef} type="file" accept=".csv" onChange={handleCSVUpload} className="hidden" />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+                >
+                  Choose CSV File
+                </button>
+                <button
+                  onClick={loadSampleCSV}
+                  className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 flex items-center"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Load Sample Data
+                </button>
+              </div>
             </div>
           </div>
 
