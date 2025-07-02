@@ -44,17 +44,23 @@ const EmployeeIDGenerator = () => {
   }
 
   const handleCSVUpload = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      Papa.parse(file, {
-        complete: (results) => {
-          setCsvData(results.data.filter((row) => row.some((cell) => cell.trim())))
-        },
-        header: true,
-        skipEmptyLines: true,
-      })
-    }
+  const file = e.target.files[0]
+  if (file) {
+    Papa.parse(file, {
+      complete: (results) => {
+        // Filter out empty rows - check if any property has a non-empty value
+        const filteredData = results.data.filter((row) => 
+          Object.values(row).some((cell) => 
+            cell && cell.toString().trim() !== ''
+          )
+        )
+        setCsvData(filteredData)
+      },
+      header: true,
+      skipEmptyLines: true,
+    })
   }
+}
 
   const loadSampleCSV = () => {
     // Load the sample CSV data
